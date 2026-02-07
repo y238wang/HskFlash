@@ -9,53 +9,58 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query(sort: \Flashcard.level) private var cards: [Flashcard]
+    @State private var currentIndex = 0
+    @State private var showDetail = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        VStack {
+            if cards.isEmpty {
+                Text("No flashcards available.")
+            } else {
+                let card = cards[currentIndex]
+                Spacer()
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 200)
+                    
+                    VStack(spacing: 12) {
+                        if showDetail {
+                            Text(card.hanzi)
+                                .font(.largeTitle)
+                            Text(card.pinyin)
+                                .foregroundColor(.secondary)
+                            Text(card.english)
+                        } else {
+                            Text(card.hanzi)
+                                .font(.system(size: 48))
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+                .onTapGesture { showDetail.toggle() }
+                Spacer()
+                HStack(spacing: 40) {
+                    Button("Prev") { move(-1) }
+                    Button("Next") { move(1) }
                 }
             }
-        } detail: {
-            Text("Select an item")
         }
+        .padding()
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
+    
+    private func move(_ delta: Int) {
+        showDetail = false
+        currentIndex = (currentIndex + delta + cards.count) % cards.count
     }
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    let container = try! ModelContainer(for: Flashcard.self)
+    
+    let context = container.mainContext
+    CardImporter.importCards(context: context)
+    
+    return ContentView()
+        .modelContainer(container)
 }

@@ -10,23 +10,28 @@ import SwiftData
 
 @main
 struct HskFlashApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+    @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
+    
+    var container: ModelContainer = {
+        let schema = Schema([Flashcard.self])
+        let config = ModelConfiguration(schema: schema)
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema, configurations: config)
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("Could not configure SwiftData container: \(error)")
         }
     }()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .modelContainer(container)
+                .onAppear {
+                    if !hasImportedCards {
+                        CardImporter.importCards(context: container.mainContext)
+                        hasImportedCards = true
+                    }
+                }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

@@ -9,18 +9,32 @@
 /* Begin PBXBuildFile section */
 		2CED47C42F37D55C0031893B /* HskFlashApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C32F37D55C0031893B /* HskFlashApp.swift */; };
 		2CED47C62F37D55C0031893B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C52F37D55C0031893B /* ContentView.swift */; };
-		2CED47C82F37D55C0031893B /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C72F37D55C0031893B /* Item.swift */; };
 		2CED47CA2F37D55D0031893B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47C92F37D55D0031893B /* Assets.xcassets */; };
 		2CED47CD2F37D55D0031893B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47CC2F37D55D0031893B /* Preview Assets.xcassets */; };
+		2CED47E72F37D6D60031893B /* Flashcard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47E62F37D6D60031893B /* Flashcard.swift */; };
+		2CED47E92F37D7940031893B /* CardImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47E82F37D7940031893B /* CardImporter.swift */; };
+		2CED47EA2F37E4900031893B /* hsk1.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47E02F37D67B0031893B /* hsk1.csv */; };
+		2CED47EB2F37E4970031893B /* hsk2.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47E32F37D67B0031893B /* hsk2.csv */; };
+		2CED47EC2F37E49B0031893B /* hsk3.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47E42F37D67B0031893B /* hsk3.csv */; };
+		2CED47ED2F37E49E0031893B /* hsk4.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47E52F37D67B0031893B /* hsk4.csv */; };
+		2CED47EE2F37E4A00031893B /* hsk5.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47E12F37D67B0031893B /* hsk5.csv */; };
+		2CED47EF2F37E4A40031893B /* hsk6.csv in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47E22F37D67B0031893B /* hsk6.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2CED47C02F37D55C0031893B /* HskFlash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HskFlash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CED47C32F37D55C0031893B /* HskFlashApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HskFlashApp.swift; sourceTree = "<group>"; };
 		2CED47C52F37D55C0031893B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		2CED47C72F37D55C0031893B /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		2CED47C92F37D55D0031893B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2CED47CC2F37D55D0031893B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2CED47E02F37D67B0031893B /* hsk1.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = hsk1.csv; sourceTree = "<group>"; };
+		2CED47E12F37D67B0031893B /* hsk5.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = hsk5.csv; sourceTree = "<group>"; };
+		2CED47E22F37D67B0031893B /* hsk6.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = hsk6.csv; sourceTree = "<group>"; };
+		2CED47E32F37D67B0031893B /* hsk2.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = hsk2.csv; sourceTree = "<group>"; };
+		2CED47E42F37D67B0031893B /* hsk3.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = hsk3.csv; sourceTree = "<group>"; };
+		2CED47E52F37D67B0031893B /* hsk4.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = hsk4.csv; sourceTree = "<group>"; };
+		2CED47E62F37D6D60031893B /* Flashcard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flashcard.swift; sourceTree = "<group>"; };
+		2CED47E82F37D7940031893B /* CardImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardImporter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,11 +67,13 @@
 		2CED47C22F37D55C0031893B /* HskFlash */ = {
 			isa = PBXGroup;
 			children = (
+				2CED47DF2F37D67B0031893B /* Resources */,
 				2CED47C32F37D55C0031893B /* HskFlashApp.swift */,
 				2CED47C52F37D55C0031893B /* ContentView.swift */,
-				2CED47C72F37D55C0031893B /* Item.swift */,
 				2CED47C92F37D55D0031893B /* Assets.xcassets */,
 				2CED47CB2F37D55D0031893B /* Preview Content */,
+				2CED47E62F37D6D60031893B /* Flashcard.swift */,
+				2CED47E82F37D7940031893B /* CardImporter.swift */,
 			);
 			path = HskFlash;
 			sourceTree = "<group>";
@@ -68,6 +84,19 @@
 				2CED47CC2F37D55D0031893B /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2CED47DF2F37D67B0031893B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2CED47E02F37D67B0031893B /* hsk1.csv */,
+				2CED47E32F37D67B0031893B /* hsk2.csv */,
+				2CED47E42F37D67B0031893B /* hsk3.csv */,
+				2CED47E52F37D67B0031893B /* hsk4.csv */,
+				2CED47E12F37D67B0031893B /* hsk5.csv */,
+				2CED47E22F37D67B0031893B /* hsk6.csv */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -130,6 +159,12 @@
 			files = (
 				2CED47CD2F37D55D0031893B /* Preview Assets.xcassets in Resources */,
 				2CED47CA2F37D55D0031893B /* Assets.xcassets in Resources */,
+				2CED47ED2F37E49E0031893B /* hsk4.csv in Resources */,
+				2CED47EC2F37E49B0031893B /* hsk3.csv in Resources */,
+				2CED47EB2F37E4970031893B /* hsk2.csv in Resources */,
+				2CED47EE2F37E4A00031893B /* hsk5.csv in Resources */,
+				2CED47EF2F37E4A40031893B /* hsk6.csv in Resources */,
+				2CED47EA2F37E4900031893B /* hsk1.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,7 +176,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CED47C62F37D55C0031893B /* ContentView.swift in Sources */,
-				2CED47C82F37D55C0031893B /* Item.swift in Sources */,
+				2CED47E92F37D7940031893B /* CardImporter.swift in Sources */,
+				2CED47E72F37D6D60031893B /* Flashcard.swift in Sources */,
 				2CED47C42F37D55C0031893B /* HskFlashApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
