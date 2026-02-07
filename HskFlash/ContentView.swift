@@ -16,7 +16,9 @@ struct ContentView: View {
     var body: some View {
         VStack {
             if cards.isEmpty {
-                Text("No flashcards available.")
+                ContentUnavailableView("No Cards Found",
+                    systemImage: "book.closed",
+                    description: Text("Check your CSV import logic."))
             } else {
                 let card = cards[currentIndex]
                 Spacer()
@@ -56,10 +58,11 @@ struct ContentView: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(for: Flashcard.self)
+    let schema = Schema([Flashcard.self])
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: schema, configurations: config)
     
-    let context = container.mainContext
-    CardImporter.importCards(context: context)
+    CardImporter.importCards(context: container.mainContext)
     
     return ContentView()
         .modelContainer(container)
