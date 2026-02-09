@@ -1,10 +1,3 @@
-//
-//  CardImporter.swift
-//  HskFlash
-//
-//  Created by Ivan Wang on 2026-02-07.
-//
-
 import SwiftUI
 import SwiftData
 

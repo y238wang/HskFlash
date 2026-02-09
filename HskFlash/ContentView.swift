@@ -1,68 +1,62 @@
-//
-//  ContentView.swift
-//  HskFlash
-//
-//  Created by Ivan Wang on 2026-02-07.
-//
-
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Query(sort: \Flashcard.level) private var cards: [Flashcard]
-    @State private var currentIndex = 0
-    @State private var showDetail = false
+    var body: some View {
+        NavigationStack { // This enables the "Push/Pop" navigation
+            VStack(spacing: 20) {
+                Text("HSK Flash")
+                    .font(.largeTitle.bold())
+                    .padding(.bottom, 40)
+
+                // NavigationLink moves the user to the StudyView
+                NavigationLink {
+                    StudyView()
+                } label: {
+                    MenuButton(title: "Learn", icon: "book.fill", color: .blue)
+                }
+
+                // Placeholder for Settings
+                Button {
+                    print("Settings tapped")
+                } label: {
+                    MenuButton(title: "Settings", icon: "gearshape.fill", color: .gray)
+                }
+
+                Spacer()
+            }
+            .padding()
+        }
+    }
+}
+
+// A reusable UI component for your buttons
+struct MenuButton: View {
+    let title: String
+    let icon: String
+    let color: Color
 
     var body: some View {
-        VStack {
-            if cards.isEmpty {
-                ContentUnavailableView("No Cards Found",
-                    systemImage: "book.closed",
-                    description: Text("Check your CSV import logic."))
-            } else {
-                let card = cards[currentIndex]
-                Spacer()
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: 200)
-                    
-                    VStack(spacing: 12) {
-                        if showDetail {
-                            Text(card.hanzi)
-                                .font(.largeTitle)
-                            Text(card.pinyin)
-                                .foregroundColor(.secondary)
-                            Text(card.english)
-                        } else {
-                            Text(card.hanzi)
-                                .font(.system(size: 48))
-                        }
-                    }
-                }
-                .onTapGesture { showDetail.toggle() }
-                Spacer()
-                HStack(spacing: 40) {
-                    Button("Prev") { move(-1) }
-                    Button("Next") { move(1) }
-                }
-            }
+        HStack {
+            Image(systemName: icon)
+            Text(title)
+                .fontWeight(.semibold)
         }
+        .frame(maxWidth: .infinity)
         .padding()
-    }
-    
-    private func move(_ delta: Int) {
-        showDetail = false
-        currentIndex = (currentIndex + delta + cards.count) % cards.count
+        .background(color.opacity(0.1))
+        .foregroundColor(color)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(color, lineWidth: 2)
+        )
     }
 }
 
 #Preview {
-    let schema = Schema([Flashcard.self])
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: schema, configurations: config)
-    
-    CardImporter.importCards(context: container.mainContext)
+    let container = try! ModelContainer(for: Flashcard.self, configurations: config)
     
     return ContentView()
         .modelContainer(container)
