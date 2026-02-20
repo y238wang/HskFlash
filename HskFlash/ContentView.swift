@@ -2,6 +2,9 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @Query(filter: #Predicate<Flashcard> { $0.lastSeen == nil })
+    private var unseenCards: [Flashcard]
+
     var body: some View {
         NavigationStack { // This enables the "Push/Pop" navigation
             VStack(spacing: 20) {
@@ -11,7 +14,7 @@ struct ContentView: View {
 
                 // NavigationLink moves the user to the StudyView
                 NavigationLink {
-                    StudyView()
+                    StudyView(cards: Array(unseenCards.shuffled().prefix(10)))
                 } label: {
                     MenuButton(title: "Learn", icon: "book.fill", color: .blue)
                 }
@@ -57,6 +60,8 @@ struct MenuButton: View {
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: Flashcard.self, configurations: config)
+    
+    CardImporter.importCards(context: container.mainContext)
     
     return ContentView()
         .modelContainer(container)

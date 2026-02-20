@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 
 @Model
@@ -6,6 +7,7 @@ class Flashcard {
     var pinyin: String
     var english: String
     var level: Int16
+    var lastSeen: Date? = nil
     
     init(hanzi: String, pinyin: String, english: String, level: Int16) {
         self.hanzi = hanzi

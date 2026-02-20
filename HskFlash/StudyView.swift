@@ -2,7 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct StudyView: View {
-    @Query(sort: \Flashcard.level) private var cards: [Flashcard]
+    let cards: [Flashcard]
+
     @State private var currentIndex = 0
     @State private var showDetail = false
 
@@ -57,8 +58,11 @@ struct StudyView: View {
     
     CardImporter.importCards(context: container.mainContext)
     
+    let descriptor = FetchDescriptor<Flashcard>()
+    let allCards = (try? container.mainContext.fetch(descriptor)) ?? []
+    
     return NavigationStack {
-        StudyView()
+        StudyView(cards: Array(allCards.prefix(10)))
     }
     .modelContainer(container)
 }
