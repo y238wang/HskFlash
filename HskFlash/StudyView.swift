@@ -4,18 +4,37 @@ import SwiftData
 struct StudyView: View {
     let cards: [Flashcard]
 
-    @State private var currentIndex = 0
+    @Environment(\.dismiss) private var dismiss
+    @State private var sessionCards: [Flashcard] = []
+    @State private var totalInitialCount: Int = 0
+    @State private var finishedCount: Int = 0
     @State private var showDetail = false
+    
+    private var progress: Double {
+        guard totalInitialCount > 0 else { return 0 }
+        return Double(finishedCount) / Double(totalInitialCount)
+    }
 
     var body: some View {
         VStack {
-            if cards.isEmpty {
-                ContentUnavailableView("No Cards Found",
-                    systemImage: "book.closed",
-                    description: Text("Check your CSV import logic."))
-            } else {
-                let card = cards[currentIndex]
+            VStack(alignment: .leading, spacing: 8) {
+                ProgressView(value: progress)
+                    .tint(.blue)
+                    .scaleEffect(x: 1, y: 2, anchor: .center) // Make it slightly thicker
+                
+                HStack {
+                    Text("Session Progress")
+                    Spacer()
+                    Text("\(finishedCount) / \(totalInitialCount)")
+                }
+                .font(.caption2.bold().monospacedDigit())
+                .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
+
+            if let card = sessionCards.first {
                 Spacer()
+                
                 ZStack {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.gray.opacity(0.2))
@@ -35,19 +54,64 @@ struct StudyView: View {
                     }
                 }
                 .onTapGesture { showDetail.toggle() }
+                
                 Spacer()
-                HStack(spacing: 40) {
-                    Button("Prev") { move(-1) }
-                    Button("Next") { move(1) }
+                
+                HStack(spacing: 8) {
+                    if showDetail {
+                        RatingButton(title: "Again", color: .red) { handleAgain() }
+                        RatingButton(title: "Hard", color: .orange) { finishCard(quality: 1) }
+                        RatingButton(title: "Good", color: .green) { finishCard(quality: 2) }
+                    }
+                    RatingButton(title: "Easy", color: .blue) { finishCard(quality: 3) }
                 }
+                .frame(height: 50)
+            } else {
+                ContentUnavailableView("Session Complete",
+                   systemImage: "checkmark.circle.fill",
+                   description: Text("You've reviewed all cards for this session."))
             }
         }
         .padding()
+        .onAppear {
+            if sessionCards.isEmpty {
+                sessionCards = cards.shuffled()
+                totalInitialCount = sessionCards.count
+            }
+        }
     }
     
-    private func move(_ delta: Int) {
+    private func handleAgain() {
         showDetail = false
-        currentIndex = (currentIndex + delta + cards.count) % cards.count
+        let card = sessionCards.removeFirst()
+        card.updateSRS(quality: 0)
+        sessionCards.append(card)
+    }
+
+    private func finishCard(quality: Int) {
+        showDetail = false
+        let card = sessionCards.removeFirst()
+        card.updateSRS(quality: quality)
+        finishedCount += 1
+    }
+}
+
+struct RatingButton: View {
+    let title: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.bold())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(color.opacity(0.2))
+                .foregroundColor(color)
+                .clipShape(Capsule())
+                .overlay(Capsule().stroke(color, lineWidth: 1))
+        }
     }
 }
 

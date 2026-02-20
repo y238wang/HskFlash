@@ -2,8 +2,18 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Query(filter: #Predicate<Flashcard> { $0.lastSeen == nil })
-    private var unseenCards: [Flashcard]
+    @Query(filter: #Predicate<Flashcard> { $0.interval == 0 })
+    private var newCards: [Flashcard]
+    
+    @Query(filter: #Predicate<Flashcard> { $0.interval > 0 })
+    private var studiedCards: [Flashcard]
+    
+    @State private var cardsForSession: [Flashcard]? = nil
+    
+    private var dueCards: [Flashcard] {
+        let now = Date.now
+        return studiedCards.filter { $0.dueDate <= now }
+    }
 
     var body: some View {
         NavigationStack { // This enables the "Push/Pop" navigation
@@ -11,10 +21,16 @@ struct ContentView: View {
                 Text("HSK Flash")
                     .font(.largeTitle.bold())
                     .padding(.bottom, 40)
+                
+                // Quick Status Stats
+                HStack(spacing: 15) {
+                    StatusBadge(label: "Reviews", count: dueCards.count, color: .orange)
+                    StatusBadge(label: "New", count: min(newCards.count, 10), color: .blue)
+                }
+                .padding(.bottom, 20)
 
-                // NavigationLink moves the user to the StudyView
-                NavigationLink {
-                    StudyView(cards: Array(unseenCards.shuffled().prefix(10)))
+                Button {
+                    prepareSession()
                 } label: {
                     MenuButton(title: "Learn", icon: "book.fill", color: .blue)
                 }
@@ -28,8 +44,37 @@ struct ContentView: View {
 
                 Spacer()
             }
+            .navigationDestination(item: $cardsForSession) { preparedCards in
+                StudyView(cards: preparedCards)
+            }
             .padding()
         }
+    }
+    
+    private func prepareSession() {
+        let tenNew = newCards
+            .sorted { $0.level < $1.level }
+            .prefix(10)
+        cardsForSession = (dueCards + Array(tenNew)).shuffled()
+    }
+}
+
+struct StatusBadge: View {
+    let label: String
+    let count: Int
+    let color: Color
+    
+    var body: some View {
+        VStack {
+            Text("\(count)")
+                .font(.headline)
+            Text(label)
+                .font(.system(.caption2, design: .default).uppercaseSmallCaps()) // Fix is here
+        }
+        .frame(width: 80, height: 50)
+        .background(color.opacity(0.1))
+        .foregroundColor(color)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
