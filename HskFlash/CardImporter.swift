@@ -3,11 +3,12 @@ import SwiftData
 
 struct CardImporter {
     @MainActor
-    static func importCards(context: ModelContext, progress: @escaping (Double) -> Void) async {
+    static func importCards(context: ModelContext, level: Int? = nil, progress: @escaping (Double) -> Void) async {
+        let levels = level != nil ? [level!] : Array(1...6)
         var currentIDOffset = 0
         
         do {
-            for level in 1...6 {
+            for level in levels {
                 let currentProgress = Double(level - 1) / Double(6)
                 await MainActor.run { progress(currentProgress) }
                 

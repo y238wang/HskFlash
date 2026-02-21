@@ -6,6 +6,7 @@ struct ContentView: View {
     
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
+    @AppStorage("hskLevel") private var hskLevel: Int = 1
     
     @State private var cardsForSession: [Flashcard]? = nil
     @State private var isShowingSettings = false
@@ -81,7 +82,7 @@ struct ContentView: View {
             isImporting = true
             
             Task { @MainActor in
-                await CardImporter.importCards(context: modelContext) { newProgress in
+                await CardImporter.importCards(context: modelContext, level: hskLevel) { newProgress in
                     self.importProgress = newProgress
                 }
                 
