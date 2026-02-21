@@ -115,13 +115,7 @@ struct ContentView: View {
         
         let newCards = (try? modelContext.fetch(descriptor)) ?? []
         
-        // Update the lastSeenID so next time we get different cards
-        if let lastID = newCards.last?.id {
-            lastSeenID = lastID
-        }
-        
-        // Mix Review cards + the 10 New cards
-        cardsForSession = (dueCards + newCards).shuffled()
+        cardsForSession = dueCards + newCards
     }
 }
 

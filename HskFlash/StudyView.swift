@@ -2,38 +2,37 @@ import SwiftUI
 import SwiftData
 
 struct StudyView: View {
-    let cards: [Flashcard]
+    let initialCount: Int
     
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     
-    @State private var sessionCards: [Flashcard] = []
-    @State private var totalInitialCount: Int = 0
+    @State private var cards: [Flashcard]
     @State private var finishedCount: Int = 0
     @State private var showDetail = false
     
-    private var progress: Double {
-        guard totalInitialCount > 0 else { return 0 }
-        return Double(finishedCount) / Double(totalInitialCount)
+    init(cards: [Flashcard]) {
+        self.cards = cards
+        initialCount = cards.count
     }
 
     var body: some View {
         VStack {
             VStack(alignment: .leading, spacing: 8) {
-                ProgressView(value: progress)
+                ProgressView(value: Double(finishedCount) / Double(initialCount))
                     .tint(.blue)
-                    .scaleEffect(x: 1, y: 2, anchor: .center) // Make it slightly thicker
+                    .scaleEffect(x: 1, y: 2, anchor: .center)
                 
                 HStack {
-                    Text("Session Progress")
+                    Text("Cards Studied")
                     Spacer()
-                    Text("\(finishedCount) / \(totalInitialCount)")
+                    Text("\(finishedCount) / \(initialCount)")
                 }
                 .font(.caption2.bold().monospacedDigit())
                 .foregroundColor(.secondary)
             }
             .padding(.horizontal)
 
-            if let card = sessionCards.first {
+            if let card = cards.first {
                 Spacer()
                 
                 ZStack {
@@ -71,7 +70,7 @@ struct StudyView: View {
                 
                 HStack(spacing: 8) {
                     Group {
-                        RatingButton(title: "Again", color: .red) { handleAgain() }
+                        RatingButton(title: "Again", color: .red) { finishCard(quality: 0) }
                         RatingButton(title: "Hard", color: .orange) { finishCard(quality: 1) }
                         RatingButton(title: "Good", color: .green) { finishCard(quality: 2) }
                     }
@@ -88,32 +87,24 @@ struct StudyView: View {
             }
         }
         .padding()
-        .onAppear {
-            if sessionCards.isEmpty {
-                sessionCards = cards.shuffled()
-                totalInitialCount = sessionCards.count
-            }
-        }
-    }
-    
-    private func handleAgain() {
-        showDetail = false
-        let card = sessionCards.removeFirst()
-        card.updateSRS(quality: 0)
-        sessionCards.append(card)
-        if card.id > lastSeenID {
-            lastSeenID = card.id
-        }
     }
 
     private func finishCard(quality: Int) {
         showDetail = false
-        let card = sessionCards.removeFirst()
-        card.updateSRS(quality: quality)
-        if card.id > lastSeenID {
-            lastSeenID = card.id
+        let card = cards.removeFirst()
+        
+        if quality == 0 {
+            cards.append(card)
+        } else {
+            finishedCount += 1
         }
-        finishedCount += 1
+        
+        Task { @MainActor in
+            card.updateSRS(quality: quality)
+            if card.id > lastSeenID {
+                lastSeenID = card.id
+            }
+        }
     }
 }
 
