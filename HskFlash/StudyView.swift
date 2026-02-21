@@ -3,9 +3,7 @@ import SwiftData
 
 struct StudyView: View {
     let initialCount: Int
-    
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
-    
     @State private var cards: [Flashcard]
     @State private var finishedCount: Int = 0
     @State private var showDetail = false
@@ -17,113 +15,122 @@ struct StudyView: View {
 
     var body: some View {
         VStack {
-            VStack(alignment: .leading, spacing: 8) {
+            // Progress Header
+            VStack(alignment: .center) {
                 ProgressView(value: Double(finishedCount) / Double(initialCount))
                     .tint(.blue)
-                    .scaleEffect(x: 1, y: 2, anchor: .center)
-                
-                HStack {
-                    Text("Cards Studied")
-                    Spacer()
-                    Text("\(finishedCount) / \(initialCount)")
-                }
-                .font(.caption2.bold().monospacedDigit())
-                .foregroundColor(.secondary)
+                Text("\(finishedCount) / \(initialCount)")
+                    .font(.system(.caption2, design: .monospaced))
+                    .foregroundColor(.secondary)
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 24)
+            .padding(.top, 10)
 
             if let card = cards.first {
                 Spacer()
                 
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: 200)
-                        .overlay(alignment: .topTrailing) {
-                            Text("HSK \(card.level)")
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Capsule().fill(Color.gray.opacity(0.15)))
-                                .foregroundColor(.gray)
-                                .padding(12) // Distance from the corner
-                        }
+                VStack {
+                    Text("HSK \(card.level)")
+                        .font(.system(size: 11, weight: .heavy, design: .rounded))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(Color.primary.opacity(0.05)))
+                        .foregroundColor(.secondary)
+                        .padding(20)
                     
-                    VStack(spacing: 12) {
+                    Text(card.hanzi)
+                        .font(.system(size: 64, weight: .medium, design: .serif))
+                        .frame(height: 90)
+                    
+                    VStack {
                         if showDetail {
-                            Text(card.hanzi)
-                                .font(.largeTitle)
                             Text(card.pinyin)
-                                .foregroundColor(.secondary)
+                                .font(.system(.title3, design: .rounded))
+                                .foregroundColor(.blue)
+                                .fontWeight(.medium)
+                            
                             Text(card.english)
+                                .font(.headline)
+                                .fontWeight(.regular)
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal)
+                                .padding(.horizontal, 30)
+                            
+                            Spacer()
+                            
+                            HStack(spacing: 12) {
+                                RectButton(icon: "xmark", label: "Incorrect", color: .red) { finishCard(quality: 0) }
+                                RectButton(icon: "checkmark", label: "Correct", color: .green) { finishCard(quality: 1) }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 20)
                         } else {
-                            Text(card.hanzi)
-                                .font(.system(size: 56))
+                            Spacer()
+                            Label("Tap to reveal", systemImage: "hand.tap")
+                                .font(.system(.caption, design: .rounded).bold())
+                                .foregroundColor(.secondary.opacity(0.7))
+                                .padding(.bottom, 20)
                         }
                     }
+                    
+                    Spacer()
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: 420)
+                .background(Color(UIColor.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .padding(.horizontal, 20)
                 .onTapGesture { showDetail.toggle() }
                 
                 Spacer()
                 
-                HStack(spacing: 8) {
-                    Group {
-                        RatingButton(title: "Again", color: .red) { finishCard(quality: 0) }
-                        RatingButton(title: "Hard", color: .orange) { finishCard(quality: 1) }
-                        RatingButton(title: "Good", color: .green) { finishCard(quality: 2) }
-                    }
-                    .opacity(showDetail ? 1 : 0)
-                    .disabled(!showDetail)
-                    
-                    RatingButton(title: "Easy", color: .blue) { finishCard(quality: 3) }
+                HStack {
+                    Spacer().frame(maxWidth: .infinity)
+                    RectButton(icon: "chevron.right", label: "Easy", color: .blue) { finishCard(quality: 3) }
                 }
-                .frame(height: 50)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 25)
+                
             } else {
-                ContentUnavailableView("Session Complete",
-                   systemImage: "checkmark.circle.fill",
-                   description: Text("You've reviewed all cards for this session."))
+                ContentUnavailableView("All Done!", systemImage: "sparkles")
             }
         }
-        .padding()
     }
 
     private func finishCard(quality: Int) {
         showDetail = false
         let card = cards.removeFirst()
-        
-        if quality == 0 {
-            cards.append(card)
-        } else {
-            finishedCount += 1
-        }
+        if quality == 0 { cards.append(card) } else { finishedCount += 1 }
         
         Task { @MainActor in
             card.updateSRS(quality: quality)
-            if card.id > lastSeenID {
-                lastSeenID = card.id
-            }
+            if card.id > lastSeenID { lastSeenID = card.id }
         }
     }
 }
 
-struct RatingButton: View {
-    let title: String
+struct RectButton: View {
+    let icon: String
+    let label: String
     let color: Color
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.subheadline.bold())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(color.opacity(0.2))
-                .foregroundColor(color)
-                .clipShape(Capsule())
-                .overlay(Capsule().stroke(color, lineWidth: 1))
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                Text(label)
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
+            }
+            .foregroundColor(color)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(color.opacity(0.12))
+            )
         }
+        .buttonStyle(.plain) // Removes the default "flash" on tap for a cleaner feel
     }
 }
 

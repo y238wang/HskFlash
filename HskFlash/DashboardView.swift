@@ -11,8 +11,9 @@ struct DashboardView: View {
     
     var body: some View {
         HStack(spacing: 15) {
-            StatusBadge(label: "Due", count: viewModel.dueCount, color: .orange)
-            StatusBadge(label: "New", count: min(viewModel.newCount, 10), color: .blue)
+            StatusBadge(label: "Due", text: String(viewModel.dueCount), color: .orange)
+            StatusBadge(label: "New", text: String(min(viewModel.newCount, 10)), color: .blue)
+            StatusBadge(label: "Seen", text: "\(lastSeenID)/\(viewModel.totalCount)", color: .gray)
         }
         .onAppear {
             viewModel.update(context: modelContext, lastSeenID: lastSeenID)
@@ -28,12 +29,12 @@ struct DashboardView: View {
 
 struct StatusBadge: View {
     let label: String
-    let count: Int
+    let text: String
     let color: Color
     
     var body: some View {
         VStack {
-            Text("\(count)")
+            Text(text)
                 .font(.headline)
             Text(label)
                 .font(.system(.caption2, design: .default).uppercaseSmallCaps())

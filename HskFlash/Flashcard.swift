@@ -25,19 +25,16 @@ class Flashcard {
         self.dueDate = .now
     }
     
-    /// Updates the card's schedule based on SM-2 logic.
-    /// - Parameter quality: 0 (Again), 1 (Hard), 2 (Good), 3 (Easy)
+    /// Updates the card's schedule based on logic inspired by SM-2.
+    /// - Parameter quality: 0 (Incorrect), 1 (Correct), 3 (Easy)
     func updateSRS(quality: Int) {
-        // 1. Handle "Again" or "Hard" (Failure to recall well)
-        // In true SM-2, 0-2 are considered failing grades for the interval.
-        if quality < 2 {
+        if quality == 0 {
             repetitions = 0
             interval = 1
         } else {
-            // 2. Update Repetitions
             repetitions += 1
             
-            // 3. Calculate Ease Factor
+            // Calculate Ease Factor
             // Formula: EF' = EF + (0.1 - (3-q) * 0.08) - (3-q) * 0.02
             // Adjusted for a 0-3 scale:
             let adjustment = 0.1 - Double(3 - quality) * (0.08 + Double(3 - quality) * 0.02)
@@ -45,9 +42,9 @@ class Flashcard {
             
             // 4. Calculate Interval (in days)
             if repetitions == 1 {
-                interval = 1
+                interval = quality
             } else if repetitions == 2 {
-                interval = 6
+                interval = 6 * quality
             } else {
                 interval = Int(round(Double(interval) * easeFactor))
             }
