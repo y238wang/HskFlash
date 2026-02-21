@@ -7,17 +7,10 @@ struct ContentView: View {
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     
-    @Query(sort: \Flashcard.dueDate) private var allCards: [Flashcard]
-    
     @State private var cardsForSession: [Flashcard]? = nil
     @State private var isShowingSettings = false
     @State private var isImporting = false
     @State private var importProgress: Double = 0.0
-    
-    private var dueCards: [Flashcard] {
-        let now = Date.now
-        return allCards.filter { $0.id < lastSeenID && $0.dueDate <= now }
-    }
 
     var body: some View {
         NavigationStack {
@@ -26,16 +19,13 @@ struct ContentView: View {
                     .font(.largeTitle.bold())
                     .padding(.bottom, 40)
                 
-                HStack(spacing: 15) {
-                    StatusBadge(label: "Reviews", count: dueCards.count, color: .orange)
-                    StatusBadge(label: "New", count: min(allCards.count - lastSeenID, 10), color: .blue)
-                }
+                DashboardView()
                 .padding(.bottom, 20)
 
                 Button {
                     prepareSession()
                 } label: {
-                    MenuButton(title: "Learn", icon: "book.fill", color: .blue)
+                    MenuButton(title: "Study", icon: "book.fill", color: .blue)
                 }
 
                 // Placeholder for Settings
@@ -102,39 +92,7 @@ struct ContentView: View {
     }
     
     private func prepareSession() {
-        // Fetch exactly the next 10 cards starting after our lastSeenID
-        let nextBatchStart = lastSeenID + 1
-        let nextBatchEnd = lastSeenID + 10
-        
-        let descriptor = FetchDescriptor<Flashcard>(
-            predicate: #Predicate<Flashcard> {
-                $0.id >= nextBatchStart && $0.id <= nextBatchEnd
-            },
-            sortBy: [SortDescriptor(\.id)]
-        )
-        
-        let newCards = (try? modelContext.fetch(descriptor)) ?? []
-        
-        cardsForSession = dueCards + newCards
-    }
-}
-
-struct StatusBadge: View {
-    let label: String
-    let count: Int
-    let color: Color
-    
-    var body: some View {
-        VStack {
-            Text("\(count)")
-                .font(.headline)
-            Text(label)
-                .font(.system(.caption2, design: .default).uppercaseSmallCaps()) // Fix is here
-        }
-        .frame(width: 80, height: 50)
-        .background(color.opacity(0.1))
-        .foregroundColor(color)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        cardsForSession = StudyService.prepareSession(context: modelContext, lastSeenID: lastSeenID)
     }
 }
 
