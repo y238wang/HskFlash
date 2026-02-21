@@ -121,3 +121,29 @@ struct RatingButton: View {
         }
     }
 }
+
+#Preview {
+    let schema = Schema([Flashcard.self])
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    
+    do {
+        let container = try ModelContainer(for: schema, configurations: config)
+        let context = container.mainContext
+        
+        let mockCards = [
+            Flashcard(id: 1, hanzi: "你好", pinyin: "nǐ hǎo", english: "Hello", level: 1),
+            Flashcard(id: 2, hanzi: "谢谢", pinyin: "xièxie", english: "Thank you", level: 1),
+            Flashcard(id: 3, hanzi: "再见", pinyin: "zàijiàn", english: "Goodbye", level: 1)
+        ]
+        
+        for card in mockCards {
+            context.insert(card)
+        }
+        
+        return StudyView(cards: mockCards)
+            .modelContainer(container)
+            
+    } catch {
+        return Text("Preview error: \(error.localizedDescription)")
+    }
+}

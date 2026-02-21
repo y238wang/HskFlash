@@ -116,3 +116,43 @@ struct MenuButton: View {
         )
     }
 }
+
+#Preview {
+    // 1. Setup the in-memory schema
+    let schema = Schema([Flashcard.self])
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    
+    do {
+        let container = try ModelContainer(for: schema, configurations: config)
+        let context = container.mainContext
+        
+        // 2. Seed some "Mock" data
+        // Let's create 20 cards total
+        for i in 1...20 {
+            let card = Flashcard(
+                id: i,
+                hanzi: "汉字 \(i)",
+                pinyin: "pīnyīn",
+                english: "English",
+                level: 1
+            )
+            
+            // Make IDs 1-5 "Due" for review by setting a past date
+            if i <= 5 {
+                card.dueDate = Date.now.addingTimeInterval(-86400) // 24 hours ago
+            }
+            
+            context.insert(card)
+        }
+        
+        return ContentView()
+            .modelContainer(container)
+            // 3. Seed AppStorage so the badges calculate correctly
+            .onAppear {
+                UserDefaults.standard.set(5, forKey: "lastSeenID")
+            }
+            
+    } catch {
+        return Text("Failed to create preview: \(error.localizedDescription)")
+    }
+}
