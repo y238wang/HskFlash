@@ -40,6 +40,15 @@ struct StudyView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.gray.opacity(0.2))
                         .frame(height: 200)
+                        .overlay(alignment: .topTrailing) {
+                            Text("HSK \(card.level)")
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Capsule().fill(Color.gray.opacity(0.15)))
+                                .foregroundColor(.gray)
+                                .padding(12) // Distance from the corner
+                        }
                     
                     VStack(spacing: 12) {
                         if showDetail {
@@ -48,9 +57,11 @@ struct StudyView: View {
                             Text(card.pinyin)
                                 .foregroundColor(.secondary)
                             Text(card.english)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
                         } else {
                             Text(card.hanzi)
-                                .font(.system(size: 48))
+                                .font(.system(size: 56))
                         }
                     }
                 }
@@ -59,11 +70,14 @@ struct StudyView: View {
                 Spacer()
                 
                 HStack(spacing: 8) {
-                    if showDetail {
+                    Group {
                         RatingButton(title: "Again", color: .red) { handleAgain() }
                         RatingButton(title: "Hard", color: .orange) { finishCard(quality: 1) }
                         RatingButton(title: "Good", color: .green) { finishCard(quality: 2) }
                     }
+                    .opacity(showDetail ? 1 : 0)
+                    .disabled(!showDetail)
+                    
                     RatingButton(title: "Easy", color: .blue) { finishCard(quality: 3) }
                 }
                 .frame(height: 50)

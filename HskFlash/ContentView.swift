@@ -4,11 +4,15 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     
+    @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     
     @Query(sort: \Flashcard.dueDate) private var allCards: [Flashcard]
     
     @State private var cardsForSession: [Flashcard]? = nil
+    @State private var isShowingSettings = false
+    @State private var isImporting = false
+    @State private var importProgress: Double = 0.0
     
     private var dueCards: [Flashcard] {
         let now = Date.now
@@ -36,17 +40,64 @@ struct ContentView: View {
 
                 // Placeholder for Settings
                 Button {
-                    print("Settings tapped")
+                    isShowingSettings = true
                 } label: {
                     MenuButton(title: "Settings", icon: "gearshape.fill", color: .gray)
                 }
 
                 Spacer()
             }
+            .padding()
+            .overlay {
+                if isImporting {
+                    ZStack {
+                        Color(uiColor: .systemBackground)
+                            .ignoresSafeArea()
+                        VStack(spacing: 20) {
+                            ProgressView(value: importProgress, total: 1.0)
+                                .progressViewStyle(.linear)
+                                .padding(.horizontal, 40)
+                            Text("Importing HSK Dictionary...")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .transition(.opacity)
+                }
+            }
             .navigationDestination(item: $cardsForSession) { preparedCards in
                 StudyView(cards: preparedCards)
             }
-            .padding()
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView()
+            }
+        }
+        .onAppear {
+            triggerImportIfNeeded()
+        }
+        .onChange(of: hasImportedCards) { oldValue, newValue in
+            if newValue == false {
+                triggerImportIfNeeded()
+            }
+        }
+    }
+    
+    private func triggerImportIfNeeded() {
+        if !hasImportedCards && !isImporting {
+            isImporting = true
+            
+            Task { @MainActor in
+                await CardImporter.importCards(context: modelContext) { newProgress in
+                    self.importProgress = newProgress
+                }
+                
+                await MainActor.run {
+                    withAnimation {
+                        hasImportedCards = true
+                        isImporting = false
+                    }
+                }
+            }
         }
     }
     

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C7997C62F49E7860026D294 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7997C52F49E7860026D294 /* SettingView.swift */; };
 		2CED47C42F37D55C0031893B /* HskFlashApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C32F37D55C0031893B /* HskFlashApp.swift */; };
 		2CED47C62F37D55C0031893B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C52F37D55C0031893B /* ContentView.swift */; };
 		2CED47CA2F37D55D0031893B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47C92F37D55D0031893B /* Assets.xcassets */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C7997C52F49E7860026D294 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		2CED47C02F37D55C0031893B /* HskFlash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HskFlash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CED47C32F37D55C0031893B /* HskFlashApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HskFlashApp.swift; sourceTree = "<group>"; };
 		2CED47C52F37D55C0031893B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 				2CED47C32F37D55C0031893B /* HskFlashApp.swift */,
 				2CED47C52F37D55C0031893B /* ContentView.swift */,
 				2CED47F02F37EF140031893B /* StudyView.swift */,
+				2C7997C52F49E7860026D294 /* SettingView.swift */,
 				2CED47C92F37D55D0031893B /* Assets.xcassets */,
 				2CED47CB2F37D55D0031893B /* Preview Content */,
 				2CED47E62F37D6D60031893B /* Flashcard.swift */,
@@ -181,6 +184,7 @@
 				2CED47C62F37D55C0031893B /* ContentView.swift in Sources */,
 				2CED47E92F37D7940031893B /* CardImporter.swift in Sources */,
 				2CED47E72F37D6D60031893B /* Flashcard.swift in Sources */,
+				2C7997C62F49E7860026D294 /* SettingView.swift in Sources */,
 				2CED47C42F37D55C0031893B /* HskFlashApp.swift in Sources */,
 				2CED47F12F37EF140031893B /* StudyView.swift in Sources */,
 			);

@@ -2,19 +2,37 @@ import SwiftUI
 import SwiftData
 
 struct CardImporter {
-    static func importCards(context: ModelContext) {
+    @MainActor
+    static func importCards(context: ModelContext, progress: @escaping (Double) -> Void) async {
         var currentIDOffset = 0
         
-        for level in 1...6 {
-            let cardCount = importCSV(startID: currentIDOffset + 1, level: level, context: context)
-            currentIDOffset += cardCount
+        do {
+            for level in 1...6 {
+                let currentProgress = Double(level - 1) / Double(6)
+                await MainActor.run { progress(currentProgress) }
+                
+                try autoreleasepool {
+                    let cardCount = try importCSV(startID: currentIDOffset + 1, level: level, context: context)
+                    currentIDOffset += cardCount
+                }
+            }
+            
+            try context.save()
+            await MainActor.run { progress(1.0) }
+            print("Successfully imported \(currentIDOffset) cards.")
+            
+        } catch {
+            print("Import failed: \(error.localizedDescription)")
         }
     }
     
-    private static func importCSV(startID: Int, level: Int, context: ModelContext) -> Int {
-        guard let url = Bundle.main.url(forResource: "hsk\(level)", withExtension: "csv"),
-              let content = try? String(contentsOf: url) else { return 0 }
+    private static func importCSV(startID: Int, level: Int, context: ModelContext) throws -> Int {
+        guard let url = Bundle.main.url(forResource: "hsk\(level)", withExtension: "csv") else {
+            print("Missing file: hsk\(level).csv")
+            return 0
+        }
         
+        let content = try String(contentsOf: url)
         let lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
         let cardCount = lines.count
         
@@ -29,9 +47,9 @@ struct CardImporter {
                 
                 let card = Flashcard(
                     id: nextID,
-                    hanzi: fields[1],
-                    pinyin: fields[2],
-                    english: fields[3],
+                    hanzi: fields[1].trimmingCharacters(in: .whitespaces),
+                    pinyin: fields[2].trimmingCharacters(in: .whitespaces),
+                    english: fields[3].trimmingCharacters(in: .whitespaces),
                     level: Int16(level)
                 )
                 context.insert(card)
