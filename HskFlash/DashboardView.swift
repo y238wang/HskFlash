@@ -5,6 +5,8 @@ struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     
+    @Query private var observer: [Flashcard]
+
     @State private var viewModel = DashboardViewModel()
     
     var body: some View {
@@ -13,6 +15,12 @@ struct DashboardView: View {
             StatusBadge(label: "New", count: min(viewModel.newCount, 10), color: .blue)
         }
         .onAppear {
+            viewModel.update(context: modelContext, lastSeenID: lastSeenID)
+        }
+        .onChange(of: observer) { _, _ in
+            viewModel.update(context: modelContext, lastSeenID: lastSeenID)
+        }
+        .onChange(of: lastSeenID) { _, _ in
             viewModel.update(context: modelContext, lastSeenID: lastSeenID)
         }
     }

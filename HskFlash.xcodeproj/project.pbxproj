@@ -11,6 +11,7 @@
 		2C7997C82F4A074C0026D294 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7997C72F4A074C0026D294 /* DashboardView.swift */; };
 		2C7997CA2F4A0A1D0026D294 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7997C92F4A0A1D0026D294 /* DashboardViewModel.swift */; };
 		2C7997CC2F4A0E350026D294 /* StudyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7997CB2F4A0E350026D294 /* StudyService.swift */; };
+		2C7997CE2F4A12B40026D294 /* CardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7997CD2F4A12B40026D294 /* CardListView.swift */; };
 		2CED47C42F37D55C0031893B /* HskFlashApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C32F37D55C0031893B /* HskFlashApp.swift */; };
 		2CED47C62F37D55C0031893B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CED47C52F37D55C0031893B /* ContentView.swift */; };
 		2CED47CA2F37D55D0031893B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CED47C92F37D55D0031893B /* Assets.xcassets */; };
@@ -31,6 +32,7 @@
 		2C7997C72F4A074C0026D294 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		2C7997C92F4A0A1D0026D294 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
 		2C7997CB2F4A0E350026D294 /* StudyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyService.swift; sourceTree = "<group>"; };
+		2C7997CD2F4A12B40026D294 /* CardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardListView.swift; sourceTree = "<group>"; };
 		2CED47C02F37D55C0031893B /* HskFlash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HskFlash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CED47C32F37D55C0031893B /* HskFlashApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HskFlashApp.swift; sourceTree = "<group>"; };
 		2CED47C52F37D55C0031893B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 				2C7997CB2F4A0E350026D294 /* StudyService.swift */,
 				2CED47F02F37EF140031893B /* StudyView.swift */,
 				2C7997C52F49E7860026D294 /* SettingView.swift */,
+				2C7997CD2F4A12B40026D294 /* CardListView.swift */,
 				2CED47C92F37D55D0031893B /* Assets.xcassets */,
 				2CED47CB2F37D55D0031893B /* Preview Content */,
 				2CED47E62F37D6D60031893B /* Flashcard.swift */,
@@ -192,6 +195,7 @@
 			files = (
 				2CED47C62F37D55C0031893B /* ContentView.swift in Sources */,
 				2CED47E92F37D7940031893B /* CardImporter.swift in Sources */,
+				2C7997CE2F4A12B40026D294 /* CardListView.swift in Sources */,
 				2C7997CC2F4A0E350026D294 /* StudyService.swift in Sources */,
 				2C7997C82F4A074C0026D294 /* DashboardView.swift in Sources */,
 				2CED47E72F37D6D60031893B /* Flashcard.swift in Sources */,

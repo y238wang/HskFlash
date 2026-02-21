@@ -27,6 +27,10 @@ struct ContentView: View {
                 } label: {
                     MenuButton(title: "Study", icon: "book.fill", color: .blue)
                 }
+                
+                NavigationLink(destination: CardListView()) {
+                    MenuButton(title: "Dictionary", icon: "character.book.closed.fill", color: .green)
+                }
 
                 // Placeholder for Settings
                 Button {
