@@ -3,8 +3,9 @@ import SwiftData
 
 struct StudyView: View {
     let cards: [Flashcard]
-
-    @Environment(\.dismiss) private var dismiss
+    
+    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
+    
     @State private var sessionCards: [Flashcard] = []
     @State private var totalInitialCount: Int = 0
     @State private var finishedCount: Int = 0
@@ -86,12 +87,18 @@ struct StudyView: View {
         let card = sessionCards.removeFirst()
         card.updateSRS(quality: 0)
         sessionCards.append(card)
+        if card.id > lastSeenID {
+            lastSeenID = card.id
+        }
     }
 
     private func finishCard(quality: Int) {
         showDetail = false
         let card = sessionCards.removeFirst()
         card.updateSRS(quality: quality)
+        if card.id > lastSeenID {
+            lastSeenID = card.id
+        }
         finishedCount += 1
     }
 }
@@ -113,20 +120,4 @@ struct RatingButton: View {
                 .overlay(Capsule().stroke(color, lineWidth: 1))
         }
     }
-}
-
-#Preview {
-    let schema = Schema([Flashcard.self])
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: schema, configurations: config)
-    
-    CardImporter.importCards(context: container.mainContext)
-    
-    let descriptor = FetchDescriptor<Flashcard>()
-    let allCards = (try? container.mainContext.fetch(descriptor)) ?? []
-    
-    return NavigationStack {
-        StudyView(cards: Array(allCards.prefix(10)))
-    }
-    .modelContainer(container)
 }

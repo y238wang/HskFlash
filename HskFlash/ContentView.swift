@@ -2,30 +2,29 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Query(filter: #Predicate<Flashcard> { $0.interval == 0 })
-    private var newCards: [Flashcard]
+    @Environment(\.modelContext) private var modelContext
     
-    @Query(filter: #Predicate<Flashcard> { $0.interval > 0 })
-    private var studiedCards: [Flashcard]
+    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
+    
+    @Query(sort: \Flashcard.dueDate) private var allCards: [Flashcard]
     
     @State private var cardsForSession: [Flashcard]? = nil
     
     private var dueCards: [Flashcard] {
         let now = Date.now
-        return studiedCards.filter { $0.dueDate <= now }
+        return allCards.filter { $0.id < lastSeenID && $0.dueDate <= now }
     }
 
     var body: some View {
-        NavigationStack { // This enables the "Push/Pop" navigation
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("HSK Flash")
                     .font(.largeTitle.bold())
                     .padding(.bottom, 40)
                 
-                // Quick Status Stats
                 HStack(spacing: 15) {
                     StatusBadge(label: "Reviews", count: dueCards.count, color: .orange)
-                    StatusBadge(label: "New", count: min(newCards.count, 10), color: .blue)
+                    StatusBadge(label: "New", count: min(allCards.count - lastSeenID, 10), color: .blue)
                 }
                 .padding(.bottom, 20)
 
@@ -52,10 +51,26 @@ struct ContentView: View {
     }
     
     private func prepareSession() {
-        let tenNew = newCards
-            .sorted { $0.level < $1.level }
-            .prefix(10)
-        cardsForSession = (dueCards + Array(tenNew)).shuffled()
+        // Fetch exactly the next 10 cards starting after our lastSeenID
+        let nextBatchStart = lastSeenID + 1
+        let nextBatchEnd = lastSeenID + 10
+        
+        let descriptor = FetchDescriptor<Flashcard>(
+            predicate: #Predicate<Flashcard> {
+                $0.id >= nextBatchStart && $0.id <= nextBatchEnd
+            },
+            sortBy: [SortDescriptor(\.id)]
+        )
+        
+        let newCards = (try? modelContext.fetch(descriptor)) ?? []
+        
+        // Update the lastSeenID so next time we get different cards
+        if let lastID = newCards.last?.id {
+            lastSeenID = lastID
+        }
+        
+        // Mix Review cards + the 10 New cards
+        cardsForSession = (dueCards + newCards).shuffled()
     }
 }
 
@@ -100,14 +115,4 @@ struct MenuButton: View {
                 .stroke(color, lineWidth: 2)
         )
     }
-}
-
-#Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Flashcard.self, configurations: config)
-    
-    CardImporter.importCards(context: container.mainContext)
-    
-    return ContentView()
-        .modelContainer(container)
 }

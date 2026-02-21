@@ -3,6 +3,8 @@ import SwiftData
 
 @Model
 class Flashcard {
+    @Attribute(.unique) var id: Int
+    
     var hanzi: String
     var pinyin: String
     var english: String
@@ -14,7 +16,8 @@ class Flashcard {
     var interval: Int = 0
     var dueDate: Date = Date.now
     
-    init(hanzi: String, pinyin: String, english: String, level: Int16) {
+    init(id: Int, hanzi: String, pinyin: String, english: String, level: Int16) {
+        self.id = id
         self.hanzi = hanzi
         self.pinyin = pinyin
         self.english = english
