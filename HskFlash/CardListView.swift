@@ -13,7 +13,7 @@ struct CardListView: View {
             List(allCards) { card in
                 CardRow(card: card, lastSeenID: lastSeenID)
             }
-            .navigationTitle("Dictionary")
+            .navigationTitle("Card List")
             // Optional: Add a search bar later!
         }
     }

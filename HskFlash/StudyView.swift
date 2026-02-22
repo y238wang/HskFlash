@@ -40,7 +40,7 @@ struct StudyView: View {
                         .padding(20)
                     
                     Text(card.hanzi)
-                        .font(.system(size: 64, weight: .medium, design: .serif))
+                        .font(.system(size: 64, design: .serif))
                         .frame(height: 90)
                     
                     VStack {

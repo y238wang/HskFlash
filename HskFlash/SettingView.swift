@@ -5,13 +5,17 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
-    // Connect to the same flag used in HskFlashApp
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @AppStorage("hskLevel") private var hskLevel: Int = 1
     
-    @State private var selectedLevelToReset = 1
+    @State private var selectedLevelToReset: Int
     @State private var isShowingResetAlert = false
+    
+    init() {
+        let currentLevel = UserDefaults.standard.integer(forKey: "hskLevel")
+        self._selectedLevelToReset = State(initialValue: currentLevel == 0 ? 1 : currentLevel)
+    }
 
     var body: some View {
         NavigationStack {

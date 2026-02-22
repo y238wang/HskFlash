@@ -30,10 +30,9 @@ struct ContentView: View {
                 }
                 
                 NavigationLink(destination: CardListView()) {
-                    MenuButton(title: "Dictionary", icon: "character.book.closed.fill", color: .green)
+                    MenuButton(title: "Card List", icon: "character.book.closed.fill", color: .green)
                 }
 
-                // Placeholder for Settings
                 Button {
                     isShowingSettings = true
                 } label: {
@@ -101,32 +100,40 @@ struct ContentView: View {
     }
 }
 
-// A reusable UI component for your buttons
 struct MenuButton: View {
     let title: String
     let icon: String
     let color: Color
 
     var body: some View {
-        HStack {
+        HStack(spacing: 15) {
             Image(systemName: icon)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(color)
+                .frame(width: 40, height: 40)
+                .background(color.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            
             Text(title)
-                .fontWeight(.semibold)
+                .font(.system(.body, design: .rounded))
+                .fontWeight(.bold)
+                .foregroundColor(.primary.opacity(0.8))
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.secondary.opacity(0.5))
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(color.opacity(0.1))
-        .foregroundColor(color)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(color, lineWidth: 2)
-        )
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+        .background(color.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 
 #Preview {
-    // 1. Setup the in-memory schema
     let schema = Schema([Flashcard.self])
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     
@@ -134,8 +141,6 @@ struct MenuButton: View {
         let container = try ModelContainer(for: schema, configurations: config)
         let context = container.mainContext
         
-        // 2. Seed some "Mock" data
-        // Let's create 20 cards total
         for i in 1...20 {
             let card = Flashcard(
                 id: i,
@@ -145,7 +150,6 @@ struct MenuButton: View {
                 level: 1
             )
             
-            // Make IDs 1-5 "Due" for review by setting a past date
             if i <= 5 {
                 card.dueDate = Date.now.addingTimeInterval(-86400) // 24 hours ago
             }
@@ -155,7 +159,6 @@ struct MenuButton: View {
         
         return ContentView()
             .modelContainer(container)
-            // 3. Seed AppStorage so the badges calculate correctly
             .onAppear {
                 UserDefaults.standard.set(5, forKey: "lastSeenID")
             }
