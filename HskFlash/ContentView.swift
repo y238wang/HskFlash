@@ -16,9 +16,17 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                Text("HSK Flash")
-                    .font(.largeTitle.bold())
-                    .padding(.bottom, 40)
+                HStack {
+                    Text("HSK Flash")
+                        .font(.system(size: 40))
+                    
+                    Image("AppLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .padding(.bottom, 40)
                 
                 DashboardView()
                 .padding(.bottom, 20)
