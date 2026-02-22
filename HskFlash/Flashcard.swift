@@ -37,7 +37,7 @@ class Flashcard {
             // Calculate Ease Factor
             // Formula: EF' = EF + (0.1 - (3-q) * 0.08) - (3-q) * 0.02
             // Adjusted for a 0-3 scale:
-            let adjustment = 0.1 - Double(3 - quality) * (0.08 + Double(3 - quality) * 0.02)
+            let adjustment = 0.1 - Double(5 - quality) * (0.08 + Double(5 - quality) * 0.02)
             easeFactor = max(1.3, easeFactor + adjustment)
             
             // 4. Calculate Interval (in days)

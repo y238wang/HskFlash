@@ -5,6 +5,7 @@ struct StudyView: View {
     let initialCount: Int
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @State private var cards: [Flashcard]
+    @State private var missedCardIDs: Set<Int> = []
     @State private var finishedCount: Int = 0
     @State private var showDetail = false
     
@@ -59,7 +60,7 @@ struct StudyView: View {
                             
                             HStack(spacing: 12) {
                                 RectButton(icon: "xmark", label: "Incorrect", color: .red) { finishCard(quality: 0) }
-                                RectButton(icon: "checkmark", label: "Correct", color: .green) { finishCard(quality: 1) }
+                                RectButton(icon: "checkmark", label: "Correct", color: .green) { correctCard() }
                             }
                             .padding(.horizontal, 20)
                             .padding(.bottom, 20)
@@ -85,7 +86,7 @@ struct StudyView: View {
                 
                 HStack {
                     Spacer().frame(maxWidth: .infinity)
-                    RectButton(icon: "chevron.right", label: "Easy", color: .blue) { finishCard(quality: 3) }
+                    RectButton(icon: "chevron.right", label: "Easy", color: .blue) { finishCard(quality: 5) }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 25)
@@ -95,11 +96,22 @@ struct StudyView: View {
             }
         }
     }
+    
+    private func correctCard() {
+        guard let currentID = cards.first?.id else { return }
+        let quality = missedCardIDs.contains(currentID) ? 1 : 3
+        finishCard(quality: quality)
+    }
 
     private func finishCard(quality: Int) {
         showDetail = false
         let card = cards.removeFirst()
-        if quality == 0 { cards.append(card) } else { finishedCount += 1 }
+        if quality == 0 {
+            cards.append(card)
+            missedCardIDs.insert(card.id)
+        } else {
+            finishedCount += 1
+        }
         
         Task { @MainActor in
             card.updateSRS(quality: quality)
