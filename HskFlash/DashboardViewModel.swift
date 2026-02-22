@@ -14,7 +14,7 @@ class DashboardViewModel {
         self.modelContext = context
         
         let now = Date.now
-        let duePredicate = #Predicate<Flashcard> { $0.id < lastSeenID && $0.dueDate <= now }
+        let duePredicate = #Predicate<Flashcard> { $0.id <= lastSeenID && $0.dueDate <= now }
         let dueDescriptor = FetchDescriptor<Flashcard>(predicate: duePredicate)
         self.dueCount = (try? context.fetchCount(dueDescriptor)) ?? 0
         

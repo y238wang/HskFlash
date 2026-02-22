@@ -30,7 +30,7 @@ class Flashcard {
     func updateSRS(quality: Int) {
         if quality == 0 {
             repetitions = 0
-            interval = 1
+            interval = 0
         } else {
             repetitions += 1
             

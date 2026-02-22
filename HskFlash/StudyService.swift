@@ -9,7 +9,7 @@ struct StudyService {
         // Fetch Due
         let dueDescriptor = FetchDescriptor<Flashcard>(
             predicate: #Predicate<Flashcard> { card in
-                card.id < lastSeenID && card.dueDate <= now
+                card.id <= lastSeenID && card.dueDate <= now
             }
         )
         let dueCards = (try? context.fetch(dueDescriptor)) ?? []
