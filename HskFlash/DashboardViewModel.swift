@@ -13,8 +13,8 @@ class DashboardViewModel {
     func update(context: ModelContext, lastSeenID: Int) {
         self.modelContext = context
         
-        let now = Date.now
-        let duePredicate = #Predicate<Flashcard> { $0.id <= lastSeenID && $0.dueDate <= now }
+        let dayBoundary = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: .now)!)
+        let duePredicate = #Predicate<Flashcard> { $0.id <= lastSeenID && $0.dueDate < dayBoundary }
         let dueDescriptor = FetchDescriptor<Flashcard>(predicate: duePredicate)
         self.dueCount = (try? context.fetchCount(dueDescriptor)) ?? 0
         

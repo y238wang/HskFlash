@@ -12,7 +12,7 @@ struct DashboardView: View {
     var body: some View {
         HStack(spacing: 15) {
             StatusBadge(label: "Due", text: String(viewModel.dueCount), color: .orange)
-            StatusBadge(label: "New", text: String(min(viewModel.newCount, 10)), color: .blue)
+            StatusBadge(label: "New", text: String(min(viewModel.newCount, 20)), color: .blue)
             StatusBadge(label: "Seen", text: "\(lastSeenID)/\(viewModel.totalCount)", color: .gray)
         }
         .onAppear {

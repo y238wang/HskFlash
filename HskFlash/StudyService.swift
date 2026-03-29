@@ -3,13 +3,13 @@ import SwiftData
 
 struct StudyService {
     static func prepareSession(context: ModelContext, lastSeenID: Int) -> [Flashcard] {
-        let now = Date.now
-        let limitID = lastSeenID + 10
+        let limitID = lastSeenID + 20
         
         // Fetch Due
+        let dayBoundary = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: .now)!)
         let dueDescriptor = FetchDescriptor<Flashcard>(
             predicate: #Predicate<Flashcard> { card in
-                card.id <= lastSeenID && card.dueDate <= now
+                card.id <= lastSeenID && card.dueDate <= dayBoundary
             }
         )
         let dueCards = (try? context.fetch(dueDescriptor)) ?? []

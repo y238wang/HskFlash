@@ -2,12 +2,13 @@ import SwiftUI
 import SwiftData
 
 struct StudyView: View {
-    let initialCount: Int
+    @Environment(\.dismiss) var dismiss
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @State private var cards: [Flashcard]
     @State private var missedCardIDs: Set<Int> = []
     @State private var finishedCount: Int = 0
     @State private var showDetail = false
+    let initialCount: Int
     
     init(cards: [Flashcard]) {
         self.cards = cards
@@ -92,7 +93,19 @@ struct StudyView: View {
                 .padding(.bottom, 25)
                 
             } else {
-                ContentUnavailableView("All Done!", systemImage: "sparkles")
+                ContentUnavailableView {
+                    Label("All Done!", systemImage: "sparkles")
+                } actions: {
+                    RectButton(
+                        icon: "chevron.left",
+                        label: "Go Back",
+                        color: .purple,
+                        action: {
+                            dismiss()
+                        }
+                    )
+                    .padding(.top, 30)
+                }
             }
         }
     }
@@ -137,6 +150,7 @@ struct RectButton: View {
             .foregroundColor(color)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
+            .padding(.horizontal, 30)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(color.opacity(0.12))
