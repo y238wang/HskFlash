@@ -73,6 +73,7 @@ struct StudyView: View {
                                 .padding(.bottom, 20)
                         }
                     }
+                    .allowsHitTesting(showDetail)
                     
                     Spacer()
                 }
