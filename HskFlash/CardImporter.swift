@@ -3,20 +3,20 @@ import SwiftData
 
 struct CardImporter {
     @MainActor
-    static func importCards(context: ModelContext, level: Int? = nil, progress: @escaping (Double) -> Void) async {
+    static func importCards(context: ModelContext, levels: [Int]? = nil, progress: @escaping (Double) -> Void) async {
         // 1. Check existing levels to avoid duplicates
         let existingLevelsDescriptor = FetchDescriptor<Flashcard>()
         let existingCards = (try? context.fetch(existingLevelsDescriptor)) ?? []
         let existingLevelSet = Set(existingCards.map { Int($0.level) })
         
         let levelsToImport: [Int]
-        if let specificLevel = level {
-            if existingLevelSet.contains(specificLevel) {
-                print("Level \(specificLevel) already imported.")
+        if let requestedLevels = levels {
+            levelsToImport = requestedLevels.filter { !existingLevelSet.contains($0) }
+            if levelsToImport.isEmpty {
+                print("Requested levels already imported.")
                 await MainActor.run { progress(1.0) }
                 return
             }
-            levelsToImport = [specificLevel]
         } else {
             levelsToImport = Array(1...6).filter { !existingLevelSet.contains($0) }
         }

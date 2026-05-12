@@ -7,7 +7,8 @@ struct SettingsView: View {
     
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
-    @AppStorage("hskLevel") private var hskLevel: Int = 1
+    @AppStorage("levelsToImportBitmask") private var levelsToImportBitmask: Int = 1
+    @AppStorage("enabledLevelsBitmask") private var enabledLevelsBitmask: Int = 1
     
     @Query private var allCards: [Flashcard]
     
@@ -15,42 +16,67 @@ struct SettingsView: View {
         Set(allCards.map { Int($0.level) })
     }
     
-    @State private var selectedLevelToAdd: Int = 1
     @State private var isShowingResetAlert = false
     
     var body: some View {
         NavigationStack {
             List {
-                Section(header: Text("Currently Loaded Levels")) {
-                    if loadedLevels.isEmpty {
-                        Text("No levels loaded")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(loadedLevels.sorted(), id: \.self) { level in
-                            Text("HSK \(level)")
+                Section(header: Text("HSK Levels")) {
+                    HStack {
+                        Button("Select All") {
+                            selectAllLoaded()
                         }
-                    }
-                }
-                
-                Section(header: Text("Add New Level")) {
-                    Picker("Select Level", selection: $selectedLevelToAdd) {
-                        ForEach(1...6, id: \.self) { level in
-                            Text("HSK \(level)").tag(level)
+                        .buttonStyle(.borderless)
+                        
+                        Spacer()
+                        
+                        Button("Deselect All") {
+                            enabledLevelsBitmask = 0
                         }
+                        .buttonStyle(.borderless)
                     }
-                    .pickerStyle(.menu)
-
-                    Button {
-                        addNewLevel()
-                    } label: {
-                        Label("Add HSK \(selectedLevelToAdd)", systemImage: "plus.circle")
-                    }
-                    .disabled(loadedLevels.contains(selectedLevelToAdd))
+                    .font(.caption)
                     
-                    if loadedLevels.contains(selectedLevelToAdd) {
-                        Text("This level is already in your deck.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    ForEach(1...6, id: \.self) { level in
+                        let isLoaded = loadedLevels.contains(level)
+                        HStack {
+                            Text("HSK \(level)")
+                            
+                            Spacer()
+                            
+                            if isLoaded {
+                                Toggle("", isOn: Binding(
+                                    get: { (enabledLevelsBitmask & (1 << (level - 1))) != 0 },
+                                    set: { newValue in
+                                        if newValue {
+                                            enabledLevelsBitmask |= (1 << (level - 1))
+                                        } else {
+                                            enabledLevelsBitmask &= ~(1 << (level - 1))
+                                        }
+                                    }
+                                ))
+                                .labelsHidden()
+                            } else {
+                                Button {
+                                    importLevel(level)
+                                } label: {
+                                    Text("Import")
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(Color.blue.opacity(0.1))
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                    }
+                    
+                    if loadedLevels.count < 6 {
+                        Button {
+                            importAllMissing()
+                        } label: {
+                            Label("Import All Missing Levels", systemImage: "arrow.down.circle")
+                        }
                     }
                 }
                 
@@ -79,10 +105,28 @@ struct SettingsView: View {
         }
     }
 
-    private func addNewLevel() {
-        // Just trigger the re-import by setting hasImportedCards to false.
-        // ContentView will see this and call CardImporter with hskLevel.
-        hskLevel = selectedLevelToAdd
+    private func selectAllLoaded() {
+        var mask = 0
+        for level in loadedLevels {
+            mask |= (1 << (level - 1))
+        }
+        enabledLevelsBitmask = mask
+    }
+
+    private func importLevel(_ level: Int) {
+        levelsToImportBitmask = (1 << (level - 1))
+        hasImportedCards = false
+        dismiss()
+    }
+
+    private func importAllMissing() {
+        var mask = 0
+        for level in 1...6 {
+            if !loadedLevels.contains(level) {
+                mask |= (1 << (level - 1))
+            }
+        }
+        levelsToImportBitmask = mask
         hasImportedCards = false
         dismiss()
     }
@@ -91,8 +135,9 @@ struct SettingsView: View {
         // 1. Wipe everything
         try? modelContext.delete(model: Flashcard.self)
         
-        // 2. Update the level preference to HSK 1
-        hskLevel = 1
+        // 2. Reset preferences
+        levelsToImportBitmask = 1
+        enabledLevelsBitmask = 1
         
         // 3. Reset pointers
         lastSeenID = 0
