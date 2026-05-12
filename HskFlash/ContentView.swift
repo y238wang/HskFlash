@@ -6,7 +6,8 @@ struct ContentView: View {
     
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
     @AppStorage("lastSeenID") private var lastSeenID: Int = 0
-    @AppStorage("hskLevel") private var hskLevel: Int = 1
+    @AppStorage("levelsToImportBitmask") private var levelsToImportBitmask: Int = 1
+    @AppStorage("enabledLevelsBitmask") private var enabledLevelsBitmask: Int = 1
     
     @State private var cardsForSession: [Flashcard]? = nil
     @State private var isShowingSettings = false
@@ -85,11 +86,12 @@ struct ContentView: View {
     }
     
     private func triggerImportIfNeeded() {
-        if !hasImportedCards && !isImporting {
+        if !hasImportedCards && !isImporting && levelsToImportBitmask != 0 {
             isImporting = true
+            let levelsToImport = (1...6).filter { (levelsToImportBitmask & (1 << ($0 - 1))) != 0 }
             
             Task { @MainActor in
-                await CardImporter.importCards(context: modelContext, level: hskLevel) { newProgress in
+                await CardImporter.importCards(context: modelContext, levels: levelsToImport) { newProgress in
                     self.importProgress = newProgress
                 }
                 
@@ -97,6 +99,7 @@ struct ContentView: View {
                     withAnimation {
                         hasImportedCards = true
                         isImporting = false
+                        levelsToImportBitmask = 0
                     }
                 }
             }
@@ -104,7 +107,8 @@ struct ContentView: View {
     }
     
     private func prepareSession() {
-        cardsForSession = StudyService.prepareSession(context: modelContext, lastSeenID: lastSeenID)
+        let enabledLevels = Set((1...6).filter { (enabledLevelsBitmask & (1 << ($0 - 1))) != 0 })
+        cardsForSession = StudyService.prepareSession(context: modelContext, lastSeenID: lastSeenID, enabledLevels: enabledLevels)
     }
 }
 
