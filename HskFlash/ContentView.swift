@@ -5,7 +5,6 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
-    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @AppStorage("levelsToImportBitmask") private var levelsToImportBitmask: Int = 1
     @AppStorage("enabledLevelsBitmask") private var enabledLevelsBitmask: Int = 1
     
@@ -108,7 +107,7 @@ struct ContentView: View {
     
     private func prepareSession() {
         let enabledLevels = Set((1...6).filter { (enabledLevelsBitmask & (1 << ($0 - 1))) != 0 })
-        cardsForSession = StudyService.prepareSession(context: modelContext, lastSeenID: lastSeenID, enabledLevels: enabledLevels)
+        cardsForSession = StudyService.prepareSession(context: modelContext, enabledLevels: enabledLevels)
     }
 }
 

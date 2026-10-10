@@ -10,6 +10,8 @@ class Flashcard {
     var english: String
     var level: Int16
     
+    var reviewCount: Int = 0
+    
     // --- SRS CORE FIELDS ---
     var repetitions: Int = 0
     var easeFactor: Double = 2.5
@@ -28,6 +30,8 @@ class Flashcard {
     /// Updates the card's schedule based on logic inspired by SM-2.
     /// - Parameter quality: 0 (Incorrect), 1 (Correct), 3 (Easy)
     func updateSRS(quality: Int) {
+        reviewCount += 1
+
         if quality == 0 {
             repetitions = 0
             interval = 0

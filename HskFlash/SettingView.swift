@@ -4,20 +4,19 @@ import SwiftData
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+     
     @AppStorage("hasImportedCards") private var hasImportedCards: Bool = false
-    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @AppStorage("levelsToImportBitmask") private var levelsToImportBitmask: Int = 1
     @AppStorage("enabledLevelsBitmask") private var enabledLevelsBitmask: Int = 1
-    
+     
     @Query private var allCards: [Flashcard]
-    
+     
     private var loadedLevels: Set<Int> {
         Set(allCards.map { Int($0.level) })
     }
-    
+     
     @State private var isShowingResetAlert = false
-    
+     
     var body: some View {
         NavigationStack {
             List {
@@ -27,23 +26,23 @@ struct SettingsView: View {
                             selectAllLoaded()
                         }
                         .buttonStyle(.borderless)
-                        
+                         
                         Spacer()
-                        
+                         
                         Button("Deselect All") {
                             enabledLevelsBitmask = 0
                         }
                         .buttonStyle(.borderless)
                     }
                     .font(.caption)
-                    
+                     
                     ForEach(1...6, id: \.self) { level in
                         let isLoaded = loadedLevels.contains(level)
                         HStack {
                             Text("HSK \(level)")
-                            
+                             
                             Spacer()
-                            
+                             
                             if isLoaded {
                                 Toggle("", isOn: Binding(
                                     get: { (enabledLevelsBitmask & (1 << (level - 1))) != 0 },
@@ -70,7 +69,7 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    
+                     
                     if loadedLevels.count < 6 {
                         Button {
                             importAllMissing()
@@ -79,7 +78,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
+                 
                 Section(header: Text("Data Management"), footer: Text("Resetting will delete ALL cards and ALL SRS progress. This cannot be undone.")) {
                     Button(role: .destructive) {
                         isShowingResetAlert = true
@@ -134,17 +133,14 @@ struct SettingsView: View {
     private func resetEverything() {
         // 1. Wipe everything
         try? modelContext.delete(model: Flashcard.self)
-        
+         
         // 2. Reset preferences
         levelsToImportBitmask = 1
         enabledLevelsBitmask = 1
-        
-        // 3. Reset pointers
-        lastSeenID = 0
-        
-        // 4. Reset the import flag to trigger a fresh import of HSK 1
+         
+        // 3. Reset the import flag to trigger a fresh import of HSK 1
         hasImportedCards = false
-        
+         
         dismiss()
     }
 }

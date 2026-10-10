@@ -3,7 +3,6 @@ import SwiftUI
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @AppStorage("enabledLevelsBitmask") private var enabledLevelsBitmask: Int = 1
     
     @Query private var observer: [Flashcard]
@@ -18,19 +17,16 @@ struct DashboardView: View {
         HStack(spacing: 15) {
             StatusBadge(label: "Due", text: String(viewModel.dueCount), color: .orange)
             StatusBadge(label: "New", text: String(min(viewModel.newCount, 20)), color: .blue)
-            StatusBadge(label: "Seen", text: "\(lastSeenID)/\(viewModel.totalCount)", color: .gray)
+            StatusBadge(label: "Studied", text: "\(viewModel.studiedCount)/\(viewModel.totalCount)", color: .gray)
         }
         .onAppear {
-            viewModel.update(context: modelContext, lastSeenID: lastSeenID, enabledLevels: enabledLevels)
+            viewModel.update(context: modelContext, enabledLevels: enabledLevels)
         }
         .onChange(of: observer) { _, _ in
-            viewModel.update(context: modelContext, lastSeenID: lastSeenID, enabledLevels: enabledLevels)
-        }
-        .onChange(of: lastSeenID) { _, _ in
-            viewModel.update(context: modelContext, lastSeenID: lastSeenID, enabledLevels: enabledLevels)
+            viewModel.update(context: modelContext, enabledLevels: enabledLevels)
         }
         .onChange(of: enabledLevelsBitmask) { _, _ in
-            viewModel.update(context: modelContext, lastSeenID: lastSeenID, enabledLevels: enabledLevels)
+            viewModel.update(context: modelContext, enabledLevels: enabledLevels)
         }
     }
 }

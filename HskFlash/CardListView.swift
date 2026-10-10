@@ -3,7 +3,6 @@ import SwiftData
 
 struct CardListView: View {
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     
     // We sort by ID so the list follows the HSK curriculum order
     @Query(sort: \Flashcard.id) private var allCards: [Flashcard]
@@ -11,7 +10,7 @@ struct CardListView: View {
     var body: some View {
         NavigationStack {
             List(allCards) { card in
-                CardRow(card: card, lastSeenID: lastSeenID)
+                CardRow(card: card)
             }
             .navigationTitle("Card List")
             // Optional: Add a search bar later!
@@ -21,7 +20,6 @@ struct CardListView: View {
 
 struct CardRow: View {
     let card: Flashcard
-    let lastSeenID: Int
     
     var body: some View {
         HStack {
@@ -49,10 +47,10 @@ struct CardRow: View {
         .padding(.vertical, 4)
     }
     
-    // This logic determines if it's "New" or shows the "Due" date
+    // This logic determines if it's "New" or shows the "Due" date based on reviewCount
     @ViewBuilder
     private var statusText: some View {
-        if card.id > lastSeenID {
+        if card.reviewCount == 0 {
             Text("New")
                 .font(.caption2)
                 .foregroundStyle(.blue)
@@ -69,15 +67,15 @@ struct CardRow: View {
 
     private var dueFormatted: String {
         let calendar = Calendar.current
-        
+         
         // 1. Strip time components by getting the start of each day
         let startOfNow = calendar.startOfDay(for: .now)
         let startOfDue = calendar.startOfDay(for: card.dueDate)
-        
+         
         // 2. Calculate the difference in whole days
         let components = calendar.dateComponents([.day], from: startOfNow, to: startOfDue)
         let days = components.day ?? 0
-        
+         
         if days < 0 {
             return "\(-days)d ago"
         } else if days == 0 {
@@ -94,28 +92,28 @@ struct CardRow: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: config)
     let context = container.mainContext
-    
+     
     // 2. Seed various card types
-    // Overdue Card
+    // Overdue Card (Studied)
     let card1 = Flashcard(id: 1, hanzi: "你好", pinyin: "nǐ hǎo", english: "Hello", level: 1)
     card1.dueDate = Calendar.current.date(byAdding: .day, value: -3, to: .now)!
-    
-    // Due Today Card
+    card1.reviewCount = 1
+     
+    // Due Today Card (Studied)
     let card2 = Flashcard(id: 2, hanzi: "谢谢", pinyin: "xièxie", english: "Thanks", level: 1)
     card2.dueDate = .now
-    
-    // Future Due Card
+    card2.reviewCount = 2
+     
+    // Future Due Card (Studied)
     let card3 = Flashcard(id: 3, hanzi: "再见", pinyin: "zàijiàn", english: "Goodbye", level: 1)
     card3.dueDate = Calendar.current.date(byAdding: .day, value: 5, to: .now)!
-    
-    // New Card (ID > lastSeenID)
+    card3.reviewCount = 1
+     
+    // New Card (Never studied, reviewCount == 0)
     let card4 = Flashcard(id: 10, hanzi: "中国", pinyin: "Zhōngguó", english: "China", level: 2)
-    
+     
     [card1, card2, card3, card4].forEach { context.insert($0) }
-    
-    // 3. Setup AppStorage for the preview environment
-    UserDefaults.standard.set(5, forKey: "lastSeenID")
-    
+     
     return CardListView()
         .modelContainer(container)
 }

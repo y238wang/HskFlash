@@ -3,13 +3,12 @@ import SwiftData
 
 struct StudyView: View {
     @Environment(\.dismiss) var dismiss
-    @AppStorage("lastSeenID") private var lastSeenID: Int = 0
     @State private var cards: [Flashcard]
     @State private var missedCardIDs: Set<Int> = []
     @State private var finishedCount: Int = 0
     @State private var showDetail = false
     let initialCount: Int
-    
+     
     init(cards: [Flashcard]) {
         self.cards = cards
         initialCount = cards.count
@@ -30,7 +29,7 @@ struct StudyView: View {
 
             if let card = cards.first {
                 Spacer()
-                
+                 
                 VStack {
                     Text("HSK \(card.level)")
                         .font(.system(size: 11, weight: .heavy, design: .rounded))
@@ -39,26 +38,26 @@ struct StudyView: View {
                         .background(Capsule().fill(Color.primary.opacity(0.05)))
                         .foregroundColor(.secondary)
                         .padding(20)
-                    
+                     
                     Text(card.hanzi)
                         .font(.system(size: 64, design: .serif))
                         .frame(height: 90)
-                    
+                     
                     VStack {
                         if showDetail {
                             Text(card.pinyin)
                                 .font(.system(.title3, design: .rounded))
                                 .foregroundColor(.blue)
                                 .fontWeight(.medium)
-                            
+                             
                             Text(card.english)
                                 .font(.headline)
                                 .fontWeight(.regular)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 30)
-                            
+                             
                             Spacer()
-                            
+                             
                             HStack(spacing: 12) {
                                 RectButton(icon: "xmark", label: "Incorrect", color: .red) { finishCard(quality: 0) }
                                 RectButton(icon: "checkmark", label: "Correct", color: .green) { correctCard() }
@@ -74,7 +73,7 @@ struct StudyView: View {
                         }
                     }
                     .allowsHitTesting(showDetail)
-                    
+                     
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
@@ -83,16 +82,16 @@ struct StudyView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 24))
                 .padding(.horizontal, 20)
                 .onTapGesture { showDetail.toggle() }
-                
+                 
                 Spacer()
-                
+                 
                 HStack {
                     Spacer().frame(maxWidth: .infinity)
                     RectButton(icon: "chevron.right", label: "Easy", color: .blue) { finishCard(quality: 5) }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 25)
-                
+                 
             } else {
                 ContentUnavailableView {
                     Label("All Done!", systemImage: "sparkles")
@@ -110,7 +109,7 @@ struct StudyView: View {
             }
         }
     }
-    
+     
     private func correctCard() {
         guard let currentID = cards.first?.id else { return }
         let quality = missedCardIDs.contains(currentID) ? 1 : 3
@@ -126,10 +125,9 @@ struct StudyView: View {
         } else {
             finishedCount += 1
         }
-        
+         
         Task { @MainActor in
             card.updateSRS(quality: quality)
-            if card.id > lastSeenID { lastSeenID = card.id }
         }
     }
 }
@@ -139,7 +137,7 @@ struct RectButton: View {
     let label: String
     let color: Color
     let action: () -> Void
-    
+     
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
@@ -157,31 +155,31 @@ struct RectButton: View {
                     .fill(color.opacity(0.12))
             )
         }
-        .buttonStyle(.plain) // Removes the default "flash" on tap for a cleaner feel
+        .buttonStyle(.plain)
     }
 }
 
 #Preview {
     let schema = Schema([Flashcard.self])
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    
+     
     do {
         let container = try ModelContainer(for: schema, configurations: config)
         let context = container.mainContext
-        
+         
         let mockCards = [
             Flashcard(id: 1, hanzi: "你好", pinyin: "nǐ hǎo", english: "Hello", level: 1),
             Flashcard(id: 2, hanzi: "谢谢", pinyin: "xièxie", english: "Thank you", level: 1),
             Flashcard(id: 3, hanzi: "再见", pinyin: "zàijiàn", english: "Goodbye", level: 1)
         ]
-        
+         
         for card in mockCards {
             context.insert(card)
         }
-        
+         
         return StudyView(cards: mockCards)
             .modelContainer(container)
-            
+             
     } catch {
         return Text("Preview error: \(error.localizedDescription)")
     }
